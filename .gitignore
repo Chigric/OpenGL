@@ -1,0 +1,7 @@
+# Source
+*.so
+*.a
+*.out
+
+# Objects files
+*.o
