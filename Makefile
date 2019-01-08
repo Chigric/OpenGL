@@ -22,7 +22,7 @@ LDFLAGS =
 # helper = http://www.opennet.ru/docs/RUS/gnumake/#Multi-config_multi-dirs
 # the build target executable:
 SRC_DIR = source
-SOURCES = $(addsuffix .cpp, main scene)
+SOURCES = $(addsuffix .cpp, main scene octahedron)
 OBJ_DIR = obj
 OBJECTS = $(addprefix $(OBJ_DIR)/,$(SOURCES:.cpp=.o))
 
@@ -30,9 +30,12 @@ OBJECTS = $(addprefix $(OBJ_DIR)/,$(SOURCES:.cpp=.o))
 
 EXECUTABLE = $(OBJ_DIR)/work.a
 
+DIRS = $(SRC_DIR) $(OBJ_DIR)
+MKDIR = mkdir -p
 
 
-.PHONY: all clean do
+
+.PHONY: all clean do start
 
 all: $(EXECUTABLE)
 
@@ -48,4 +51,7 @@ clean:
 	$(RM) $(EXECUTABLE) $(OBJECTS)
 
 do: all
-	./$(EXECUTABLE) 
+	./$(EXECUTABLE)
+
+start:
+	$(MKDIR) $(DIRS)

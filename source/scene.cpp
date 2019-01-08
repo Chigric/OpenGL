@@ -1,15 +1,21 @@
-#include "scene.h"
 #include <GL/freeglut.h>
+
+#include <list>
+#include <functional>
+
+#include "scene.h"
 #include "global.h"
 
 using namespace GL_WR;
+using namespace std;
 
 Scene::Scene(int argc, char **argv)
 {
     //Graphics display resolution
     //4 : 3
+    cur_resol = 3/4;
     WIDTH_WINDOW = 1000;
-    HIEGHT_WINDOW = 750;
+    HIEGHT_WINDOW = WIDTH_WINDOW * 3/4;
 
 
     //Glut funcs
@@ -22,8 +28,10 @@ Scene::Scene(int argc, char **argv)
     //General funstions of scene
     this->std_funcs();
 
+    //Glut std dinamic funcs
 	glutDisplayFunc(this->render);
 	glutReshapeFunc(this->reshape);
+    glutSpecialFunc(this->keyboard);
 
 	this->timer(0);
 
@@ -35,7 +43,9 @@ Scene::~Scene()
 
 void Scene::std_funcs()
 {
-    this->reshape = &Reshape;
-    this->render = &Render;
-    this->timer = &Timer;
+    this->keyboard = &octahKeyboard;
+    this->reshape = &octahReshape;
+    this->render = &octahRender;
+    this->timer = &octahTimer;
+
 }

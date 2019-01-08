@@ -2,6 +2,9 @@
 #define GLOBAL_H
 
 #include <GL/freeglut.h>
+#include <iostream>
+
+#include "scene.h"
 
 namespace GL_WR {
     class Scene;
@@ -17,7 +20,7 @@ namespace GL_WR {
         GLfloat _z;
     };
 
-    inline void color3f(GLfloat3 color)
+    inline void color3f(const GLfloat3& color)
     {
         glColor3f(color._x, color._y, color._z);
     }
@@ -33,37 +36,6 @@ namespace GL_WR {
     const GLfloat3 cyan = {0.0, 1.0, 1.0};
     const GLfloat3 white = {1.0, 1.0, 1.0};
     const GLfloat3 brown = {0.588, 0.294, 0.0};
-
-    void Timer(int iUnused)
-    {
-        //Logic
-        glutPostRedisplay();
-        glutTimerFunc(30, Timer, 0);
-    }
-
-    void Render(void) {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glPushAttrib(GL_LINE_BIT);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-        glBegin(GL_POLYGON);
-            glVertex3f(0.5, 0.0, 0.5);
-            glVertex3f(0.5, 0.0, 0.0);
-            glVertex3f(0.0, 0.5, 0.0);
-            glVertex3f(0.0, 0.0, 0.5);
-        glEnd();
-        glFlush();
-
-
-        glPopAttrib();
-        glFlush();
-    }
-
-    void Reshape(int Width, int Height)
-    {
-    	Render();
-    }
 }
 
 #endif //GLOBAL_H
