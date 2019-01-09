@@ -11,6 +11,8 @@
 #include "octahedron.h"
 
 namespace GL_WR {
+	extern Octahedron octah1;
+
 	class Scene {
 
 	private:
@@ -32,6 +34,10 @@ namespace GL_WR {
 	public:
 		Scene(int, char**);
 		~Scene();
+
+		static inline const unsigned int getFIMS() {
+		    return FRAME_IN_MSECS;
+		}
 	};
 }
 

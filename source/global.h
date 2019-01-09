@@ -10,19 +10,24 @@ namespace GL_WR {
     class Scene;
 
     struct GLfloat2 {
-        GLfloat _x;
-        GLfloat _y;
+        GLfloat x;
+        GLfloat y;
     };
 
     struct GLfloat3 {
-        GLfloat _x;
-        GLfloat _y;
-        GLfloat _z;
+        GLfloat x;
+        GLfloat y;
+        GLfloat z;
     };
 
     inline void color3f(const GLfloat3& color)
     {
-        glColor3f(color._x, color._y, color._z);
+        glColor3f(color.x, color.y, color.z);
+    }
+
+    inline void setColorBackground(const GLfloat3& color)
+    {
+        glClearColor(color.x, color.y, color.z, 1.0);
     }
 
     //COLORS
