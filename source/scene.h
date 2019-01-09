@@ -16,11 +16,15 @@ namespace GL_WR {
 	class Scene {
 
 	private:
-		void std_funcs();
+		void setGlutStaticFuncs();
+		void initGlutStaticFuncs();
+		void initGlut(int, char**);
 
 		//WINDOW
+		GLfloat WINDOW_X;
+		GLfloat WINDOW_Y;
 		GLfloat WIDTH_WINDOW;
-	    GLfloat HIEGHT_WINDOW;
+	    GLfloat HEIGHT_WINDOW;
 		GLfloat cur_resol;
 
 		//FRAMES

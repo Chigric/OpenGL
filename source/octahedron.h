@@ -22,10 +22,10 @@ namespace GL_WR {
 		//angles
 		GLfloat rotateY;
 	public:
-		Octahedron(GLfloat);
-		Octahedron(GLfloat, GLfloat);
+		Octahedron(GLfloat parametres);
+		Octahedron(GLfloat base_parametres, GLfloat height);
 		Octahedron(const GLfloat2&);
-		Octahedron(GLfloat, GLfloat, GLfloat);
+		Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height);
 		Octahedron(const GLfloat3&);
 
 		friend void octahTimer(int);
