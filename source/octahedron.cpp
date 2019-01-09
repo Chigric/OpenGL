@@ -105,12 +105,33 @@ void GL_WR::octahReshape(int Width, int Height)
     octahRender();
 }
 
-void GL_WR::octahKeyboard(int key, int x, int y)
+void GL_WR::octahSpecKeyboard(int key, int x, int y)
 {
     switch(key)
     {
         case GLUT_KEY_F1:
             std::cout << "F1 is pressed\n";
+            break;
+        case GLUT_KEY_F10:
+            std::cout << "F10 is pressed (exit)\n";
+            exit(0x0);
+            break;
+        default:
+            std::cout << key << " is pressed" << "\n";
+            break;
+    }
+    glutPostRedisplay();
+}
+
+void GL_WR::octahKeyboard(unsigned char key, int x, int y)
+{
+    switch (key) {
+        case 0x1b:
+            std::cout << "'Esc' is pressed (exit)\n";
+            exit(0x0);
+            break;
+        default:
+            cout << key << '\n';
             break;
     }
     glutPostRedisplay();

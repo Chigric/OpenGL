@@ -11,6 +11,7 @@
 #include "octahedron.h"
 
 namespace GL_WR {
+	class Octahedron;
 	extern Octahedron octah1;
 
 	class Scene {
@@ -30,7 +31,8 @@ namespace GL_WR {
 		//FRAMES
 	    static const unsigned int FRAME_IN_MSECS = 30;
 
-		void (*keyboard)(int, int, int);
+		void (*specKeyboard)(int, int, int);
+		void (*keyboard)(unsigned char, int, int);
 		void (*reshape)(int, int);
 		void (*render)(void);
 		void (*timer)(int);

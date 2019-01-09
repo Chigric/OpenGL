@@ -12,7 +12,8 @@ namespace GL_WR {
 	void octahTimer(int);
 	void octahRender(void);
 	void octahReshape(int, int);
-	void octahKeyboard(int, int, int);
+	void octahSpecKeyboard(int, int, int);
+	void octahKeyboard(unsigned char, int, int);
 
 	class Octahedron {
 		GLfloat height;
@@ -31,7 +32,8 @@ namespace GL_WR {
 		friend void octahTimer(int);
 		friend void octahRender(void);
 		friend void octahReshape(int, int);
-		friend void octahKeyboard(int, int, int);
+		friend void octahSpecKeyboard (int, int, int);
+		friend void octahKeyboard(unsigned char, int, int);
 	};
 }
 

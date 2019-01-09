@@ -38,6 +38,7 @@ Scene::~Scene()
 
 void Scene::initGlutStaticFuncs()
 {
+    this->specKeyboard = &octahSpecKeyboard;
     this->keyboard = &octahKeyboard;
     this->reshape = &octahReshape;
     this->render = &octahRender;
@@ -51,7 +52,8 @@ void Scene::setGlutStaticFuncs()
     //Glut std dinamic funcs
     glutDisplayFunc(this->render);
     glutReshapeFunc(this->reshape);
-    glutSpecialFunc(this->keyboard);
+    glutKeyboardFunc(this->keyboard);
+    glutSpecialFunc(this->specKeyboard);
 }
 
 void Scene::initGlut(int argc, char **argv)
