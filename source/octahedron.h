@@ -18,6 +18,9 @@ namespace GL_WR {
 		GLfloat height;
 		GLfloat base_width;
 		GLfloat base_length;
+
+		//angles
+		GLfloat rotateY;
 	public:
 		Octahedron(GLfloat);
 		Octahedron(GLfloat, GLfloat);
