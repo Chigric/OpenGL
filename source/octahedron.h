@@ -28,9 +28,10 @@ namespace GL_WR {
 		GLfloat rotateY;
 		GLfloat speedRot;
 		GLfloat stdSpeedRot;
-		
+
 	private:
 		void pause();
+		void paint();
 
 	public:
 		Octahedron(GLfloat parametres);

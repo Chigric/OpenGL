@@ -62,15 +62,21 @@ void GL_WR::octahRender(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Очистка экрана и буфера глубины
 
     glPushAttrib(GL_LINE_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    //Paint
+    octah1.paint();
+
+    glPopAttrib();
+    glFlush();
+}
+
+void Octahedron::paint()
+{
     glLoadIdentity();   // Сброс просмотра
     // glTranslatef(-octah1.base_length/2, -octah1.height/2, 0.0f); // Сдвиг влево экрана
 
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    color3f(GL_WR::green);
-
-    glRotatef(octah1.rotateY,1.0f,0.0f,0.0f);   // Вращение треугольника по оси Y
+    glRotatef(rotateY,1.0f,0.0f,0.0f);   // Вращение треугольника по оси Y
 
     glBegin(GL_TRIANGLES);  // Начало рисования треугольника
         // передняя грань
@@ -105,10 +111,6 @@ void GL_WR::octahRender(void) {
         glColor3f(0.0f,1.0f,0.0f);      // Зеленный
         glVertex3f(-0.5f,-0.5f, 0.5f);  // Право треугольника (Лево)
     glEnd();    // Кончили рисовать пирамиду
-    glFlush();
-
-    glPopAttrib();
-    glFlush();
 }
 
 void GL_WR::octahReshape(int Width, int Height)
