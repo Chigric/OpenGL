@@ -16,12 +16,22 @@ namespace GL_WR {
 	void octahKeyboard(unsigned char, int, int);
 
 	class Octahedron {
+		//Status
+		bool isFrozen;
+
+		//Parametres
 		GLfloat height;
 		GLfloat base_width;
 		GLfloat base_length;
 
-		//angles
+		//Angles
 		GLfloat rotateY;
+		GLfloat speedRot;
+		GLfloat stdSpeedRot;
+		
+	private:
+		void pause();
+
 	public:
 		Octahedron(GLfloat parametres);
 		Octahedron(GLfloat base_parametres, GLfloat height);

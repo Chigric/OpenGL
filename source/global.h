@@ -30,6 +30,8 @@ namespace GL_WR {
         glClearColor(color.x, color.y, color.z, 1.0);
     }
 
+    enum Keys {Esc = 0x1b, Space = 0x20};
+
     //COLORS
     const GLfloat3 black = {0.0, 0.0, 0.0};
     const GLfloat3 red = {1.0, 0.0, 0.0};
