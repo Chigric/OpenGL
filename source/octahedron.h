@@ -29,9 +29,22 @@ namespace GL_WR {
 		GLfloat speedRot;
 		GLfloat stdSpeedRot;
 
+		//Vertex
+		static const size_t qual_V = 6;
+		static const size_t qual_side = 8;
+		GLfloat *vertex;
+		GLfloat *color;
+	    GLubyte **trigons;
+
 	private:
+		void initVertex();
 		void pause();
 		void paint();
+		void printTrigons(size_t ind, 	const GLfloat3& color);
+		void printTrigons(	size_t ind,
+							const GLfloat3& color1,
+							const GLfloat3& color2,
+							const GLfloat3& color3);
 
 	public:
 		Octahedron(GLfloat parametres);
@@ -39,6 +52,8 @@ namespace GL_WR {
 		Octahedron(const GLfloat2&);
 		Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height);
 		Octahedron(const GLfloat3&);
+
+		~Octahedron();
 
 		friend void octahTimer(int);
 		friend void octahRender(void);

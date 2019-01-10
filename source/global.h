@@ -20,14 +20,20 @@ namespace GL_WR {
         GLfloat z;
     };
 
-    inline void color3f(const GLfloat3& color)
-    {
+    inline void color3f(const GLfloat3& color) {
         glColor3f(color.x, color.y, color.z);
     }
 
-    inline void setColorBackground(const GLfloat3& color)
-    {
+    inline void setColorBackground(const GLfloat3& color) {
         glClearColor(color.x, color.y, color.z, 1.0);
+    }
+
+    template<typename T>
+    void setArray(T* array, const GLfloat3& ptr3) {
+        size_t i = 0;
+        array[i++] = ptr3.x;
+        array[i++] = ptr3.y;
+        array[i++] = ptr3.z;
     }
 
     enum Keys {Esc = 0x1b, Space = 0x20};
