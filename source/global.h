@@ -18,6 +18,12 @@ namespace GL_WR {
         GLfloat x;
         GLfloat y;
         GLfloat z;
+
+        void init(const GLfloat3& ptr) {
+            this->x = ptr.x;
+            this->y = ptr.y;
+            this->z = ptr.z;
+        }
     };
 
     inline void color3f(const GLfloat3& color) {
@@ -36,7 +42,8 @@ namespace GL_WR {
         array[i++] = ptr3.z;
     }
 
-    enum Keys {Esc = 0x1b, Space = 0x20};
+    enum Keys {Esc = 0x1b, Space = 0x20, A = 0x61, B, C, D, E, F, G, H, I, J, K,
+        L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
 
     //COLORS
     const GLfloat3 black = {0.0, 0.0, 0.0};

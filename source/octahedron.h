@@ -3,7 +3,6 @@
 
 #include <GL/freeglut.h>
 #include "global.h"
-#include "octahedron.h"
 
 namespace GL_WR {
 	struct GLfloat2;
@@ -25,8 +24,10 @@ namespace GL_WR {
 		GLfloat base_length;
 
 		//Angles
-		GLfloat rotateY;
-		GLfloat speedRot;
+		int autoRotX, autoRotY, autoRotZ;
+		GLfloat3* lastAutoRot;
+		GLfloat3* rotate;
+		GLfloat3* speedRot;
 		GLfloat stdSpeedRot;
 
 		//Vertex
@@ -39,6 +40,7 @@ namespace GL_WR {
 	private:
 		void initVertex();
 		void pause();
+		void autoRotate();
 		void paint();
 		void printTrigons(size_t ind, 	const GLfloat3& color);
 		void printTrigons(	size_t ind,

@@ -17,16 +17,25 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->base_length   = base_length;
 
     //Agels
-    this->rotateY = 0;
+    this->rotate = new GLfloat3;
+    rotate->init({0, 0, 0});
+
+    autoRotX = 0;
+    autoRotY = 0;
+    autoRotZ = 0;
+
+    lastAutoRot = new GLfloat3;
+    lastAutoRot->init({0, 0, 0});
 
     //Default speed of Agels
     this->stdSpeedRot = 0.8f;
 
     //Speed of Agels
-    this->speedRot = stdSpeedRot;
+    this->speedRot = new GLfloat3;
+    speedRot->init({0, 0, 0});
 
     //Status
-    this->isFrozen = false;
+    this->isFrozen = true;
 
     initVertex();
 }
@@ -53,6 +62,11 @@ Octahedron::Octahedron(const GLfloat3& a)
 
 Octahedron::~Octahedron()
 {
+    delete lastAutoRot;
+
+    delete rotate;
+    delete speedRot;
+
     delete color;
     delete vertex;
 }
@@ -119,7 +133,9 @@ void Octahedron::paint()
     glLoadIdentity();   // Сброс просмотра
     // glTranslatef(-octah1.base_length/2, -octah1.height/2, 0.0f); // Сдвиг влево экрана
 
-    glRotatef(rotateY,1.0f,1.0f,1.0f);   // Вращение треугольников
+    glRotatef(rotate->x, 1, 0, 0);// Вращение треугольников по оси X
+    glRotatef(rotate->y, 0, 1, 0);// Вращение треугольников по оси Y
+    glRotatef(rotate->z, 0, 0, 1);// Вращение треугольников по оси Z
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertex);
@@ -139,20 +155,45 @@ void Octahedron::paint()
 void Octahedron::pause()
 {
     if (isFrozen) {
-        std::cout << "start\n";
-        speedRot = stdSpeedRot;
+        std::cout << "\n\tstart\n";
         isFrozen = false;
+        autoRotX = lastAutoRot->x;
+        autoRotY = lastAutoRot->y;
+        autoRotZ = lastAutoRot->z;
     } else {
-        std::cout << "stop\n";
-        speedRot = 0;
+        std::cout << "\n\tstop\n";
         isFrozen = true;
+        lastAutoRot->init({autoRotX, autoRotY, autoRotZ});
+        autoRotX = 0;
+        autoRotY = 0;
+        autoRotZ = 0;
     }
+
+    if (autoRotX || autoRotY || autoRotZ)
+        isFrozen = false;
+}
+
+void Octahedron::autoRotate()
+{
+    //Logic
+    cout << "It's octahedron is frozen: " << isFrozen << "\n";
+
+    if (!isFrozen) {
+        speedRot->x = (autoRotX*stdSpeedRot);
+        speedRot->y = (autoRotY*stdSpeedRot);
+        speedRot->z = (autoRotZ*stdSpeedRot);
+    } else
+        speedRot->init({0,0,0});
+
+    //Переменная вращения
+    rotate->x += speedRot->x;
+    rotate->y += speedRot->y;
+    rotate->z += speedRot->z;
 }
 
 void GL_WR::octahTimer(int iUnused)
 {
-    //Logic
-    octah1.rotateY += octah1.speedRot;  // Увеличим переменную вращения
+    octah1.autoRotate();
 
     glutPostRedisplay();
     glutTimerFunc(GL_WR::Scene::getFIMS(), octahTimer, 0);
@@ -205,6 +246,31 @@ void GL_WR::octahKeyboard(unsigned char key, int x, int y)
             std::cout << "'Space' is pressed (pause): ";
             octah1.pause();
             break;
+        case Keys::S:
+            std::cout << "'S' is pressed: ";
+            octah1.autoRotY = (octah1.autoRotY < 0) ? 0 : -1;
+            octah1.isFrozen = (octah1.isFrozen) ? false : true;
+            break;
+        case Keys::W:
+            std::cout << "'W' is pressed: ";
+            octah1.autoRotY = (octah1.autoRotY > 0) ? 0 : 1;
+            octah1.isFrozen = (octah1.isFrozen) ? false : true;
+            break;
+        case Keys::A:
+            std::cout << "'W' is pressed (pause): ";
+            octah1.autoRotX = (octah1.autoRotX != 0) ? -1 : 0;
+            break;
+        case Keys::D:
+            std::cout << "'W' is pressed (pause): ";
+            octah1.autoRotX = (octah1.autoRotX != 0) ? 1 : 0;
+            break;
+        case Keys::Z:
+            std::cout << "'Z' is pressed (pause): ";
+            octah1.autoRotZ = (octah1.autoRotZ != 0) ? -1 : 0;
+            break;
+        case Keys::X:
+            std::cout << "'X' is pressed (pause): ";
+            octah1.autoRotZ = (octah1.autoRotZ != 0) ? 1 : 0;
         default:
             unsigned int dd = key;
             cout << "U enter: " << key << " (" << dd << ")\n";
