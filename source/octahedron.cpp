@@ -24,7 +24,7 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     autoRotY = 0;
     autoRotZ = 0;
 
-    lastAutoRot = new GLfloat3;
+    this->lastAutoRot = new GLfloat3;
     lastAutoRot->init({0, 0, 0});
 
     //Default speed of Agels
@@ -74,16 +74,20 @@ Octahedron::~Octahedron()
 void Octahedron::initVertex()
 {
     //Color
-    color = new GLfloat[qual_V*3];
-    setArray(&color[0],		white);
-    setArray(&color[3],		yellow);
-    setArray(&color[6],		green);
-    setArray(&color[9],		brown);
-    setArray(&color[12],	amber);
-    setArray(&color[15],	magenta);
+    color = new GLfloat3[qual_side+2];
+    color[0].init(green);
+    color[1].init(blue);
+    color[2].init(yellow);
+    color[3].init(cyan);
+    color[4].init(amber);
+    color[5].init(magenta);
+    color[6].init(red);
+    color[7].init(brown);
+    color[8].init(deepPink);
+    color[9].init(black);
 
     //Vertex
-    vertex = new GLfloat[qual_V*3];
+    vertex = new GLfloat[qual_V*dimension];
     setArray(&vertex[0],	{0.0, height, 0.0});
     setArray(&vertex[3],	{base_length/2, 0.0, base_width/2});
     setArray(&vertex[6],	{-base_length/2, 0.0, -base_width/2});
@@ -94,23 +98,23 @@ void Octahedron::initVertex()
     //Indexes
     trigons = new GLubyte*[qual_side];
     for (size_t i = 0; i < qual_side; i++) {
-        trigons[i] = new GLubyte[3];
+        trigons[i] = new GLubyte[dimension];
     }
     setArray(trigons[0], {0, 4, 1});
     setArray(trigons[1], {0, 1, 3});
     setArray(trigons[2], {0, 3, 2});
     setArray(trigons[3], {0, 2, 4});
 
-    setArray(trigons[4], {5, 4, 1});
-    setArray(trigons[5], {5, 1, 3});
-    setArray(trigons[6], {5, 3, 2});
     setArray(trigons[7], {5, 2, 4});
+    setArray(trigons[6], {5, 3, 2});
+    setArray(trigons[5], {5, 1, 3});
+    setArray(trigons[4], {5, 4, 1});
 }
 
 void Octahedron::printTrigons(size_t ind, const GLfloat3& color)
 {
     color3f(color);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, trigons[ind]);
+    glDrawElements(GL_TRIANGLES, dimension, GL_UNSIGNED_BYTE, trigons[ind]);
 }
 
 void Octahedron::printTrigons( size_t ind,
@@ -128,26 +132,30 @@ void Octahedron::printTrigons( size_t ind,
     glEnd();
 }
 
+float ptr = 0;
+
 void Octahedron::paint()
 {
-    glLoadIdentity();   // Сброс просмотра
     // glTranslatef(-octah1.base_length/2, -octah1.height/2, 0.0f); // Сдвиг влево экрана
 
     glRotatef(rotate->x, 1, 0, 0);// Вращение треугольников по оси X
     glRotatef(rotate->y, 0, 1, 0);// Вращение треугольников по оси Y
     glRotatef(rotate->z, 0, 0, 1);// Вращение треугольников по оси Z
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, vertex);
+    glTranslatef(0.0, 0, 0.5f);
 
-    printTrigons(0, blue);
-    printTrigons(1, green);
-    printTrigons(2, yellow);
-    printTrigons(3, cyan);
-    printTrigons(4, amber);
-    printTrigons(5, magenta);
-    printTrigons(6, red);
-    printTrigons(7, brown, white, black);
+    glRotatef(ptr, 0, 1, 0);// Вращение треугольников по оси X
+    ptr-=1;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(dimension, GL_FLOAT, 0, vertex);
+
+    for(size_t i = 0; i < qual_side-1; i++) {
+        printTrigons(i, color[i]);
+    }
+
+    printTrigons(qual_side-1, color[qual_side-1],
+                    color[qual_side+0], color[qual_side+1]);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 }
@@ -200,13 +208,24 @@ void GL_WR::octahTimer(int iUnused)
 }
 
 void GL_WR::octahRender(void) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Очистка экрана и буфера глубины
+    // Очистка экрана и буфера глубины
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // glPushAttrib(GL_LINE_BIT);
-    // glClear(GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_EQUAL);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
+    // glFrontFace(GL_CCW); //Она стоит по умолчанию, так что нет смысла её юзать
+
+    glLoadIdentity();   // Сброс просмотра
 
     //Paint
     octah1.paint();
+
+    glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_CULL_FACE);
 
     // glPopAttrib();
     glFlush();

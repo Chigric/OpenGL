@@ -48,6 +48,7 @@ namespace GL_WR {
     //COLORS
     const GLfloat3 black = {0.0, 0.0, 0.0};
     const GLfloat3 red = {1.0, 0.0, 0.0};
+    const GLfloat3 orangered = {1.0, 0.27, 0.0};
     const GLfloat3 green = {0.0, 1.0, 0.0};
     const GLfloat3 yellow = {1.0, 1.0, 0.0};
     const GLfloat3 amber = {1.0, 0.749, 0.0};
@@ -56,6 +57,12 @@ namespace GL_WR {
     const GLfloat3 cyan = {0.0, 1.0, 1.0};
     const GLfloat3 white = {1.0, 1.0, 1.0};
     const GLfloat3 brown = {0.588, 0.294, 0.0};
+    const GLfloat3 pink = {1.0, 0.753, 0.796};
+    const GLfloat3 lightPink = {1.0, 0.714, 0.757};
+    const GLfloat3 hotPink = {1.0, 0.412, 0.706};
+    const GLfloat3 deepPink = {1.0, 0.078, 0.576};
+    const GLfloat3 palevioletred = {0.859, 0.439, 0.576};
+    const GLfloat3 mediumvioletred = {0.780, 0.082, 0.522};
 }
 
 #endif //GLOBAL_H
