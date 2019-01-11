@@ -41,6 +41,8 @@ namespace GL_WR {
 		Scene(int, char**);
 		~Scene();
 
+		static void printRule();
+
 		static inline const unsigned int getFIMS() {
 		    return FRAME_IN_MSECS;
 		}

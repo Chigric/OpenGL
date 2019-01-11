@@ -27,6 +27,9 @@ Scene::Scene(int argc, char **argv)
     //General funstions of scene
     this->initGlutStaticFuncs();
 
+    //Rules of keys
+    this->printRule();
+
     //Start global timer (static function of glut)
 	this->timer(0);
 
@@ -64,4 +67,18 @@ void Scene::initGlut(int argc, char **argv)
 	glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 	glutInitWindowSize(WIDTH_WINDOW, HEIGHT_WINDOW);
 	glutCreateWindow("Lab_OGL");
+}
+
+void Scene::printRule()
+{
+    cout << "Клавиши:" << endl <<
+        '\t' << "F1: подсказка клавишь" << endl <<
+        '\t' << "F2: раздвинуть грани" << endl <<
+        '\t' << "F3: сдвинуть грани" << endl <<
+        '\t' << "W/S: автоматическое движение в полоскости Ox" << endl <<
+        '\t' << "A/D: автоматическое движение в полоскости Oy" << endl <<
+        '\t' << "Z/X: автоматическое движение в полоскости Oz" << endl <<
+        '\t' << "Up/Down: движение в плоскости Ox" << endl <<
+        '\t' << "Left/Right: движение в полоскости Oy" << endl <<
+        '\t' << "Brack Left/Right: движение в полоскости Oz" << endl;
 }

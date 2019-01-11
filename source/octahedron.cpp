@@ -27,7 +27,8 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     lastAutoRot->init({0, 0, 0});
 
     //Default speed of Agels
-    this->stdSpeedRot = 0.8f;
+    this->stdAutoSpeedRot = 0.8f;
+    this->stdSpeedRot = 2.f;
 
     //Speed of Agels
     this->speedRot = new GLfloat3;
@@ -37,6 +38,11 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->isFrozen = true;
 
     initVertex();
+
+    //Separation
+    this->stdSpeedSeparation = 0.025f;
+    this->separation = new GLfloat[Three_V];
+    setArray(separation, {0, 0, 0});
 }
 
 Octahedron::Octahedron(GLfloat base_parametres, GLfloat height)
@@ -67,8 +73,13 @@ Octahedron::~Octahedron()
     delete rotate;
     delete speedRot;
 
-    delete color;
-    delete vertex;
+    delete[] color;
+    delete[] vertex;
+    for (size_t i = 0; i < qual_V; i++)
+        delete[] trigons[i];
+    delete[] trigons;
+
+    delete[] separation;
 }
 
 void Octahedron::initVertex()
@@ -88,12 +99,12 @@ void Octahedron::initVertex()
 
     //Vertex
     vertex = new GLfloat[qual_V*dimension];
-    setArray(&vertex[0],	{0.0, height, 0.0});
-    setArray(&vertex[3],	{base_length/2, 0.0, base_width/2});
-    setArray(&vertex[6],	{-base_length/2, 0.0, -base_width/2});
-    setArray(&vertex[9],	{base_length/2, 0.0, -base_width/2});
-    setArray(&vertex[12],	{-base_length/2, 0.0, base_width/2});
-    setArray(&vertex[15],	{0.0, -height, 0.0});
+    setArray(&vertex[0],	{0.0, height, 0.0});                   //0
+    setArray(&vertex[3],	{base_length/2, 0.0, base_width/2});   //1
+    setArray(&vertex[6],	{-base_length/2, 0.0, -base_width/2}); //2
+    setArray(&vertex[9],	{base_length/2, 0.0, -base_width/2});  //3
+    setArray(&vertex[12],	{-base_length/2, 0.0, base_width/2});  //4
+    setArray(&vertex[15],	{0.0, -height, 0.0});                  //5
 
     //Indexes
     trigons = new GLubyte*[qual_side];
@@ -105,16 +116,47 @@ void Octahedron::initVertex()
     setArray(trigons[2], {0, 3, 2});
     setArray(trigons[3], {0, 2, 4});
 
-    setArray(trigons[7], {5, 2, 4});
-    setArray(trigons[6], {5, 3, 2});
-    setArray(trigons[5], {5, 1, 3});
     setArray(trigons[4], {5, 4, 1});
+    setArray(trigons[5], {5, 1, 3});
+    setArray(trigons[6], {5, 3, 2});
+    setArray(trigons[7], {5, 2, 4});
+}
+
+void Octahedron::addSeparation(size_t ind)
+{
+    GLfloat tmp[dimension];
+    setArray(tmp, {0, 0, 0});
+    for (size_t i = 0; i < Three_V; i++) {
+        for (size_t j = 0; j < Three_V; j++) {
+            tmp[i] += vertex[trigons[ind][j] * Three_V + i];
+        }
+
+        if (tmp[i] < 0.f)
+            separation[i] = -stdSpeedSeparation;
+        else if (tmp[i] == 0.f)
+            separation[i] = 0.f;
+        else
+            separation[i] = stdSpeedSeparation;
+
+        for (size_t k = 0; k < dimension; k++)
+            vertex[trigons[ind][k] * Three_V + i] += separation[i];
+    }
+}
+
+void Octahedron::deleteSeparation(size_t ind)
+{
+    for (size_t i = 0; i < Three_V; i++) {
+        for (size_t k = 0; k < dimension; k++)
+            vertex[trigons[ind][k] * Three_V + i] -= separation[i];
+    }
 }
 
 void Octahedron::printTrigons(size_t ind, const GLfloat3& color)
 {
-    color3f(color);
-    glDrawElements(GL_TRIANGLES, dimension, GL_UNSIGNED_BYTE, trigons[ind]);
+    addSeparation(ind);
+        color3f(color);
+        glDrawElements(GL_TRIANGLES, dimension, GL_UNSIGNED_BYTE, trigons[ind]);
+    deleteSeparation(ind);
 }
 
 void Octahedron::printTrigons( size_t ind,
@@ -122,14 +164,16 @@ void Octahedron::printTrigons( size_t ind,
                             const GLfloat3& color2,
                             const GLfloat3& color3)
 {
-    glBegin(GL_TRIANGLES);
-        color3f(color1);
-        glArrayElement(trigons[ind][0]);
-        color3f(color2);
-        glArrayElement(trigons[ind][1]);
-        color3f(color3);
-        glArrayElement(trigons[ind][2]);
-    glEnd();
+    addSeparation(ind);
+        glBegin(GL_TRIANGLES);
+            color3f(color1);
+            glArrayElement(trigons[ind][0]);
+            color3f(color2);
+            glArrayElement(trigons[ind][1]);
+            color3f(color3);
+            glArrayElement(trigons[ind][2]);
+        glEnd();
+    deleteSeparation(ind);
 }
 
 void Octahedron::paint()
@@ -189,12 +233,10 @@ void Octahedron::changeRot(GLfloat& axis, const GLfloat& direction)
 void Octahedron::autoRotate()
 {
     //Logic
-    cout << "It's octahedron is frozen: " << isFrozen << "\n";
-
     if (!isFrozen) {
-        speedRot->x = (autoRot->x*stdSpeedRot);
-        speedRot->y = (autoRot->y*stdSpeedRot);
-        speedRot->z = (autoRot->z*stdSpeedRot);
+        speedRot->x = (autoRot->x*stdAutoSpeedRot);
+        speedRot->y = (autoRot->y*stdAutoSpeedRot);
+        speedRot->z = (autoRot->z*stdAutoSpeedRot);
     } else
         speedRot->init({0,0,0});
 
@@ -246,11 +288,34 @@ void GL_WR::octahSpecKeyboard(int key, int x, int y)
     switch(key)
     {
         case GLUT_KEY_F1:
-            std::cout << "F1 is pressed\n";
+            std::cout << "F1 is pressed (help)\n";
+            GL_WR::Scene::printRule();
+            break;
+        case GLUT_KEY_F2:
+            // std::cout << "F2 is pressed\n";
+            if (octah1.stdSpeedSeparation < 0.5f)
+                octah1.stdSpeedSeparation += 0.025f;
+            break;
+        case GLUT_KEY_F3:
+            // std::cout << "F3 is pressed\n";
+            if (octah1.stdSpeedSeparation > 0.0f)
+                octah1.stdSpeedSeparation -= 0.025f;
             break;
         case GLUT_KEY_F10:
             std::cout << "F10 is pressed (exit)\n";
             exit(0x0);
+            break;
+        case GLUT_KEY_LEFT:
+            octah1.rotate->y -= octah1.stdSpeedRot;
+            break;
+        case GLUT_KEY_RIGHT:
+            octah1.rotate->y += octah1.stdSpeedRot;
+            break;
+        case GLUT_KEY_UP:
+            octah1.rotate->x -= octah1.stdSpeedRot;
+            break;
+        case GLUT_KEY_DOWN:
+            octah1.rotate->x += octah1.stdSpeedRot;
             break;
         default:
             std::cout << key << " is pressed" << "\n";
@@ -271,28 +336,34 @@ void GL_WR::octahKeyboard(unsigned char key, int x, int y)
             octah1.pause();
             break;
         case Keys::W:
-            std::cout << "'W' is pressed: ";
+            // std::cout << "'W' is pressed: ";
             octah1.changeRot(octah1.autoRot->x, -1);
             break;
         case Keys::S:
-            std::cout << "'S' is pressed: ";
+            // std::cout << "'S' is pressed: ";
             octah1.changeRot(octah1.autoRot->x, 1);
             break;
         case Keys::A:
-            std::cout << "'W' is pressed (pause): ";
+            // std::cout << "'W' is pressed (pause): ";
             octah1.changeRot(octah1.autoRot->y, -1);
             break;
         case Keys::D:
-            std::cout << "'W' is pressed (pause): ";
+            // std::cout << "'D' is pressed (pause): ";
             octah1.changeRot(octah1.autoRot->y, 1);
             break;
         case Keys::Z:
-            std::cout << "'Z' is pressed (pause): ";
+            // std::cout << "'Z' is pressed (pause): ";
             octah1.changeRot(octah1.autoRot->z, -1);
             break;
         case Keys::X:
-            std::cout << "'X' is pressed (pause): ";
+            // std::cout << "'X' is pressed (pause): ";
             octah1.changeRot(octah1.autoRot->z, 1);
+        case Keys::Brack_R:
+            octah1.rotate->z -= octah1.stdSpeedRot;
+            break;
+        case Keys::Brack_L:
+            octah1.rotate->z += octah1.stdSpeedRot;
+            break;
         default:
             unsigned int dd = key;
             cout << "U enter: " << key << " (" << dd << ")\n";

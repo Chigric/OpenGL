@@ -28,6 +28,7 @@ namespace GL_WR {
 		GLfloat3* lastAutoRot;
 		GLfloat3* rotate;
 		GLfloat3* speedRot;
+		GLfloat stdAutoSpeedRot;
 		GLfloat stdSpeedRot;
 
 		//Vertex
@@ -36,6 +37,11 @@ namespace GL_WR {
 		GLfloat *vertex;
 		GLfloat3 *color;
 	    GLubyte **trigons;
+
+		//Separation
+		static const size_t Three_V = 3; //Потому что у нас треугольники (3 стороны)
+		GLfloat *separation;
+		GLfloat stdSpeedSeparation;
 
 		//World
 		const size_t dimension = 3;
@@ -51,6 +57,8 @@ namespace GL_WR {
 							const GLfloat3& color1,
 							const GLfloat3& color2,
 							const GLfloat3& color3);
+		void addSeparation(size_t ind);
+		void deleteSeparation(size_t ind);
 
 	public:
 		Octahedron(GLfloat parametres);

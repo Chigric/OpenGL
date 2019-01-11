@@ -43,7 +43,7 @@ namespace GL_WR {
     }
 
     enum Keys {Esc = 0x1b, Space = 0x20, A = 0x61, B, C, D, E, F, G, H, I, J, K,
-        L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
+        L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Brack_L = 0x5b, Brack_R = 0x5d};
 
     //COLORS
     const GLfloat3 black = {0.0, 0.0, 0.0};
