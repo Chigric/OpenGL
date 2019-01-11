@@ -20,9 +20,8 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->rotate = new GLfloat3;
     rotate->init({0, 0, 0});
 
-    autoRotX = 0;
-    autoRotY = 0;
-    autoRotZ = 0;
+    this->autoRot = new GLfloat3;
+    autoRot->init({0, 0, 0});
 
     this->lastAutoRot = new GLfloat3;
     lastAutoRot->init({0, 0, 0});
@@ -62,6 +61,7 @@ Octahedron::Octahedron(const GLfloat3& a)
 
 Octahedron::~Octahedron()
 {
+    delete autoRot;
     delete lastAutoRot;
 
     delete rotate;
@@ -132,8 +132,6 @@ void Octahedron::printTrigons( size_t ind,
     glEnd();
 }
 
-float ptr = 0;
-
 void Octahedron::paint()
 {
     // glTranslatef(-octah1.base_length/2, -octah1.height/2, 0.0f); // Сдвиг влево экрана
@@ -142,10 +140,7 @@ void Octahedron::paint()
     glRotatef(rotate->y, 0, 1, 0);// Вращение треугольников по оси Y
     glRotatef(rotate->z, 0, 0, 1);// Вращение треугольников по оси Z
 
-    glTranslatef(0.0, 0, 0.5f);
-
-    glRotatef(ptr, 0, 1, 0);// Вращение треугольников по оси X
-    ptr-=1;
+    // glTranslatef(0.0, 0, 0.5f);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(dimension, GL_FLOAT, 0, vertex);
@@ -165,20 +160,30 @@ void Octahedron::pause()
     if (isFrozen) {
         std::cout << "\n\tstart\n";
         isFrozen = false;
-        autoRotX = lastAutoRot->x;
-        autoRotY = lastAutoRot->y;
-        autoRotZ = lastAutoRot->z;
+        autoRot->init(*lastAutoRot);
     } else {
         std::cout << "\n\tstop\n";
         isFrozen = true;
-        lastAutoRot->init({autoRotX, autoRotY, autoRotZ});
-        autoRotX = 0;
-        autoRotY = 0;
-        autoRotZ = 0;
+        lastAutoRot->init(*autoRot);
+        autoRot->init({0, 0, 0});
     }
 
-    if (autoRotX || autoRotY || autoRotZ)
+    if (autoRot->x || autoRot->y || autoRot->z)
         isFrozen = false;
+}
+
+void Octahedron::changeRot(GLfloat& axis, const GLfloat& direction)
+{
+    if ( (direction * axis) > 0 ) {
+        axis = 0;
+        isFrozen = true;
+
+        if (autoRot->x || autoRot->y || autoRot->z)
+            isFrozen = false;
+    } else {
+        axis = direction;
+        isFrozen = false;
+    }
 }
 
 void Octahedron::autoRotate()
@@ -187,9 +192,9 @@ void Octahedron::autoRotate()
     cout << "It's octahedron is frozen: " << isFrozen << "\n";
 
     if (!isFrozen) {
-        speedRot->x = (autoRotX*stdSpeedRot);
-        speedRot->y = (autoRotY*stdSpeedRot);
-        speedRot->z = (autoRotZ*stdSpeedRot);
+        speedRot->x = (autoRot->x*stdSpeedRot);
+        speedRot->y = (autoRot->y*stdSpeedRot);
+        speedRot->z = (autoRot->z*stdSpeedRot);
     } else
         speedRot->init({0,0,0});
 
@@ -265,31 +270,29 @@ void GL_WR::octahKeyboard(unsigned char key, int x, int y)
             std::cout << "'Space' is pressed (pause): ";
             octah1.pause();
             break;
-        case Keys::S:
-            std::cout << "'S' is pressed: ";
-            octah1.autoRotY = (octah1.autoRotY < 0) ? 0 : -1;
-            octah1.isFrozen = (octah1.isFrozen) ? false : true;
-            break;
         case Keys::W:
             std::cout << "'W' is pressed: ";
-            octah1.autoRotY = (octah1.autoRotY > 0) ? 0 : 1;
-            octah1.isFrozen = (octah1.isFrozen) ? false : true;
+            octah1.changeRot(octah1.autoRot->x, -1);
+            break;
+        case Keys::S:
+            std::cout << "'S' is pressed: ";
+            octah1.changeRot(octah1.autoRot->x, 1);
             break;
         case Keys::A:
             std::cout << "'W' is pressed (pause): ";
-            octah1.autoRotX = (octah1.autoRotX != 0) ? -1 : 0;
+            octah1.changeRot(octah1.autoRot->y, -1);
             break;
         case Keys::D:
             std::cout << "'W' is pressed (pause): ";
-            octah1.autoRotX = (octah1.autoRotX != 0) ? 1 : 0;
+            octah1.changeRot(octah1.autoRot->y, 1);
             break;
         case Keys::Z:
             std::cout << "'Z' is pressed (pause): ";
-            octah1.autoRotZ = (octah1.autoRotZ != 0) ? -1 : 0;
+            octah1.changeRot(octah1.autoRot->z, -1);
             break;
         case Keys::X:
             std::cout << "'X' is pressed (pause): ";
-            octah1.autoRotZ = (octah1.autoRotZ != 0) ? 1 : 0;
+            octah1.changeRot(octah1.autoRot->z, 1);
         default:
             unsigned int dd = key;
             cout << "U enter: " << key << " (" << dd << ")\n";

@@ -24,7 +24,7 @@ namespace GL_WR {
 		GLfloat base_length;
 
 		//Angles
-		int autoRotX, autoRotY, autoRotZ;
+		GLfloat3* autoRot;
 		GLfloat3* lastAutoRot;
 		GLfloat3* rotate;
 		GLfloat3* speedRot;
@@ -43,6 +43,7 @@ namespace GL_WR {
 	private:
 		void initVertex();
 		void pause();
+		void changeRot(GLfloat& axis, const GLfloat& direction);
 		void autoRotate();
 		void paint();
 		void printTrigons(size_t ind, 	const GLfloat3& color);
