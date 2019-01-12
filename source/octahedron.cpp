@@ -189,12 +189,23 @@ void Octahedron::paint()
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(dimension, GL_FLOAT, 0, vertex);
 
-    for(size_t i = 0; i < qual_side-1; i++) {
-        printTrigons(i, color[i]);
+    GLfloat angel = 0.0f;
+    for(size_t i = 0; i < qual_side; i++) {
+        glPushMatrix();
+            glRotatef(angel, 0.0, 1.0, 0.0);
+            if (i == qual_side-1)
+                printTrigons(0, color[qual_side-1],
+                                color[qual_side+0], color[qual_side+1]);
+            else
+                printTrigons(0, color[i]);
+        glPopMatrix();
+        if (angel == 270) {
+            glRotatef(180, 0.0, 0.0, 1.0);
+            angel = 0;
+        } else {
+            angel += 90;
+        }
     }
-
-    printTrigons(qual_side-1, color[qual_side-1],
-                    color[qual_side+0], color[qual_side+1]);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 }
@@ -246,6 +257,13 @@ void Octahedron::autoRotate()
     rotate->z += speedRot->z;
 }
 
+void Octahedron::drawSphere()
+{
+    color3f(white);
+    glTranslatef(0.0f, 0.0f, base_length);
+    glutSolidSphere(0.025, 25, 25);
+}
+
 void GL_WR::octahTimer(int iUnused)
 {
     octah1.autoRotate();
@@ -271,6 +289,9 @@ void GL_WR::octahRender(void) {
     //Paint
     octah1.paint();
 
+    //Light
+    // octah1.drawSphere();
+
     glDisable(GL_DEPTH_TEST);
     // glDisable(GL_CULL_FACE);
 
@@ -280,6 +301,10 @@ void GL_WR::octahRender(void) {
 
 void GL_WR::octahReshape(int Width, int Height)
 {
+    // glViewport(0, 0, 1000, 750);
+    // gluOrtho2D(0, 1000, 0, 750);
+    // gluOrtho2D(0, 1, 0, 0.75);
+
     octahRender();
 }
 

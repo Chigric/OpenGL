@@ -59,6 +59,7 @@ namespace GL_WR {
 							const GLfloat3& color3);
 		void addSeparation(size_t ind);
 		void deleteSeparation(size_t ind);
+		void drawSphere();
 
 	public:
 		Octahedron(GLfloat parametres);
