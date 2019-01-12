@@ -80,5 +80,6 @@ void Scene::printRule()
         '\t' << "Z/X: автоматическое движение в полоскости Oz" << endl <<
         '\t' << "Up/Down: движение в плоскости Ox" << endl <<
         '\t' << "Left/Right: движение в полоскости Oy" << endl <<
-        '\t' << "Brack Left/Right: движение в полоскости Oz" << endl;
+        '\t' << "Brack Left/Right ([]): движение в полоскости Oz" << endl <<
+        '\t' << "F10/Esc: закрыть программу" << endl;
 }

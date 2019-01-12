@@ -5,3 +5,9 @@
 
 # Objects files
 *.o
+
+# Code::Blocks
+*.cbp
+*.depend
+*.layout
+*.exe

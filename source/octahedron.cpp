@@ -18,7 +18,7 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
 
     //Agels
     this->rotate = new GLfloat3;
-    rotate->init({0, 0, 0});
+    rotate->init({-10, 22.5, 0});
 
     this->autoRot = new GLfloat3;
     autoRot->init({0, 0, 0});
@@ -43,6 +43,8 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->stdSpeedSeparation = 0.025f;
     this->separation = new GLfloat[Three_V];
     setArray(separation, {0, 0, 0});
+
+    addSeparation();
 }
 
 Octahedron::Octahedron(GLfloat base_parametres, GLfloat height)
