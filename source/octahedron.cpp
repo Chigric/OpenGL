@@ -101,7 +101,7 @@ void Octahedron::initVertex()
     vertex = new GLfloat[Three_V*dimension];
     setArray(&vertex[0],	{0.0, height, 0.0});                   //0
     setArray(&vertex[3],	{base_length/2, 0.0, base_width/2});   //1
-    setArray(&vertex[6],	{-base_length/2, 0.0, base_width/2});  //4
+    setArray(&vertex[6],	{-base_length/2, 0.0, base_width/2});  //2
 
     //Indexes
     trigons = new GLubyte[Three_V];
@@ -157,23 +157,56 @@ void Octahedron::printTrigons(  const GLfloat3& color1,
     glEnd();
 }
 
+void getNormal(float p1[3], float p2[3], float p3[3], float vNormal[3])
+{
+    float v1[3], v2[3]; // для промежуточных вычислений
+    float l; // норма
+
+    v1[0] = p2[0]- p1[0];
+    v1[1] = p2[1]- p1[1];
+    v1[2] = p2[2]- p1[2];
+
+    v2[0] = p3[0]- p1[0];
+    v2[1] = p3[1]- p1[1];
+    v2[2] = p3[2]- p1[2];
+
+    vNormal[0] = v1[1] * v2[2] - v1[2] * v2[1];
+    vNormal[1] = v1[2] * v2[0] - v1[0] * v2[2];
+    vNormal[2] = v1[0] * v2[1] - v1[1] * v2[0];
+
+    l = sqrt(vNormal[0]*vNormal[0] + vNormal[1]*vNormal[1] + vNormal[2]*vNormal[2]);
+    // нормирование
+    vNormal[0] /= l;
+    vNormal[1] /= l;
+    vNormal[2] /= l;
+}
+
 void Octahedron::paint()
 {
-    // glTranslatef(-octah1.base_length/2, -octah1.height/2, 0.0f); // Сдвиг влево экрана
-
     glRotatef(rotate->x, 1, 0, 0);// Вращение треугольников по оси X
     glRotatef(rotate->y, 0, 1, 0);// Вращение треугольников по оси Y
     glRotatef(rotate->z, 0, 0, 1);// Вращение треугольников по оси Z
 
     // glTranslatef(0.0, 0, 0.5f);
+    GLfloat arr[] = {0, height/2, base_width/4, 1};
+    float norm[3] = {0.0f , 0.0f , 0.0f};
+    getNormal(&vertex[0], &vertex[3], &vertex[6], norm);
+    for (int i = 0; i < 3; i++)
+        norm[i] *= -1;
+    cout << norm[0] << ' ' << norm[1] << ' ' << norm[2] << '\n';
 
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(dimension, GL_FLOAT, 0, vertex);
+    glNormalPointer(GL_FLOAT, 0, norm);
 
     GLfloat angel = 0.0f;
     for(size_t i = 0; i < qual_side; i++) {
         glPushMatrix();
             glRotatef(angel, 0.0, 1.0, 0.0);
+            //
+            // // // glNormal3f(0.0f, height, base_width/2);
+            //
             if (i == qual_side-1)
                 printTrigons(color[qual_side-1],
                             color[qual_side+0], color[qual_side+1]);
@@ -188,7 +221,8 @@ void Octahedron::paint()
         }
     }
 
-    glEnableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 void Octahedron::pause()
@@ -241,7 +275,7 @@ void Octahedron::autoRotate()
 void Octahedron::drawSphere()
 {
     color3f(white);
-    glTranslatef(0.0f, 0.0f, base_length);
+    glTranslatef(0.0f, 0.f, 0.5);
     glutSolidSphere(0.025, 25, 25);
 }
 
@@ -259,7 +293,7 @@ void GL_WR::octahRender(void) {
 
     // glPushAttrib(GL_LINE_BIT);
 
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHT0);
     // glDepthFunc(GL_EQUAL);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_BACK);
@@ -271,13 +305,16 @@ void GL_WR::octahRender(void) {
     octah1.paint();
 
     //Light
-    // octah1.drawSphere();
+    octah1.drawSphere();
+    float lightpos[] = {0., 0, 0.5, 1};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-    glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glutSwapBuffers();
 
     // glPopAttrib();
-    glFlush();
+    // glFlush();
 }
 
 void GL_WR::octahReshape(int Width, int Height)

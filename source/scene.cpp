@@ -67,6 +67,16 @@ void Scene::initGlut(int argc, char **argv)
 	glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 	glutInitWindowSize(WIDTH_WINDOW, HEIGHT_WINDOW);
 	glutCreateWindow("Lab_OGL");
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING); // глобальное
+    glEnable(GL_LIGHT0);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // двухстороннее освещение
+
+    GLfloat light_col[] = {1.f, 1.f, 1.f, 1.f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_col);
+    // glEnable(GL_NORMALIZE); //???
+    // glEnable(GL_COLOR_MATERIAL);
 }
 
 void Scene::printRule()
