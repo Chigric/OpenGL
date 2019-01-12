@@ -75,8 +75,6 @@ Octahedron::~Octahedron()
 
     delete[] color;
     delete[] vertex;
-    for (size_t i = 0; i < qual_V; i++)
-        delete[] trigons[i];
     delete[] trigons;
 
     delete[] separation;
@@ -98,37 +96,23 @@ void Octahedron::initVertex()
     color[9].init(black);
 
     //Vertex
-    vertex = new GLfloat[qual_V*dimension];
+    vertex = new GLfloat[Three_V*dimension];
     setArray(&vertex[0],	{0.0, height, 0.0});                   //0
     setArray(&vertex[3],	{base_length/2, 0.0, base_width/2});   //1
-    setArray(&vertex[6],	{-base_length/2, 0.0, -base_width/2}); //2
-    setArray(&vertex[9],	{base_length/2, 0.0, -base_width/2});  //3
-    setArray(&vertex[12],	{-base_length/2, 0.0, base_width/2});  //4
-    setArray(&vertex[15],	{0.0, -height, 0.0});                  //5
+    setArray(&vertex[6],	{-base_length/2, 0.0, base_width/2});  //4
 
     //Indexes
-    trigons = new GLubyte*[qual_side];
-    for (size_t i = 0; i < qual_side; i++) {
-        trigons[i] = new GLubyte[dimension];
-    }
-    setArray(trigons[0], {0, 4, 1});
-    setArray(trigons[1], {0, 1, 3});
-    setArray(trigons[2], {0, 3, 2});
-    setArray(trigons[3], {0, 2, 4});
-
-    setArray(trigons[4], {5, 4, 1});
-    setArray(trigons[5], {5, 1, 3});
-    setArray(trigons[6], {5, 3, 2});
-    setArray(trigons[7], {5, 2, 4});
+    trigons = new GLubyte[Three_V];
+    setArray(trigons, {0, 2, 1});
 }
 
-void Octahedron::addSeparation(size_t ind)
+void Octahedron::addSeparation()
 {
     GLfloat tmp[dimension];
     setArray(tmp, {0, 0, 0});
     for (size_t i = 0; i < Three_V; i++) {
         for (size_t j = 0; j < Three_V; j++) {
-            tmp[i] += vertex[trigons[ind][j] * Three_V + i];
+            tmp[i] += vertex[trigons[j] * Three_V + i];
         }
 
         if (tmp[i] < 0.f)
@@ -139,41 +123,36 @@ void Octahedron::addSeparation(size_t ind)
             separation[i] = stdSpeedSeparation;
 
         for (size_t k = 0; k < dimension; k++)
-            vertex[trigons[ind][k] * Three_V + i] += separation[i];
+            vertex[trigons[k] * Three_V + i] += separation[i];
     }
 }
 
-void Octahedron::deleteSeparation(size_t ind)
+void Octahedron::deleteSeparation()
 {
     for (size_t i = 0; i < Three_V; i++) {
         for (size_t k = 0; k < dimension; k++)
-            vertex[trigons[ind][k] * Three_V + i] -= separation[i];
+            vertex[trigons[k] * Three_V + i] -= separation[i];
     }
 }
 
-void Octahedron::printTrigons(size_t ind, const GLfloat3& color)
+void Octahedron::printTrigons(const GLfloat3& color)
 {
-    addSeparation(ind);
-        color3f(color);
-        glDrawElements(GL_TRIANGLES, dimension, GL_UNSIGNED_BYTE, trigons[ind]);
-    deleteSeparation(ind);
+    color3f(color);
+    glDrawElements(GL_TRIANGLES, dimension, GL_UNSIGNED_BYTE, trigons);
 }
 
-void Octahedron::printTrigons( size_t ind,
-                            const GLfloat3& color1,
-                            const GLfloat3& color2,
-                            const GLfloat3& color3)
+void Octahedron::printTrigons(  const GLfloat3& color1,
+                                const GLfloat3& color2,
+                                const GLfloat3& color3)
 {
-    addSeparation(ind);
-        glBegin(GL_TRIANGLES);
-            color3f(color1);
-            glArrayElement(trigons[ind][0]);
-            color3f(color2);
-            glArrayElement(trigons[ind][1]);
-            color3f(color3);
-            glArrayElement(trigons[ind][2]);
-        glEnd();
-    deleteSeparation(ind);
+    glBegin(GL_TRIANGLES);
+        color3f(color1);
+        glArrayElement(trigons[0]);
+        color3f(color2);
+        glArrayElement(trigons[1]);
+        color3f(color3);
+        glArrayElement(trigons[2]);
+    glEnd();
 }
 
 void Octahedron::paint()
@@ -194,10 +173,10 @@ void Octahedron::paint()
         glPushMatrix();
             glRotatef(angel, 0.0, 1.0, 0.0);
             if (i == qual_side-1)
-                printTrigons(0, color[qual_side-1],
-                                color[qual_side+0], color[qual_side+1]);
+                printTrigons(color[qual_side-1],
+                            color[qual_side+0], color[qual_side+1]);
             else
-                printTrigons(0, color[i]);
+                printTrigons(color[i]);
         glPopMatrix();
         if (angel == 270) {
             glRotatef(180, 0.0, 0.0, 1.0);
@@ -318,13 +297,13 @@ void GL_WR::octahSpecKeyboard(int key, int x, int y)
             break;
         case GLUT_KEY_F2:
             // std::cout << "F2 is pressed\n";
-            if (octah1.stdSpeedSeparation < 0.5f)
-                octah1.stdSpeedSeparation += 0.025f;
+            if (octah1.vertex[1] < (octah1.height * 2.5f))
+                octah1.addSeparation();
             break;
         case GLUT_KEY_F3:
             // std::cout << "F3 is pressed\n";
-            if (octah1.stdSpeedSeparation > 0.0f)
-                octah1.stdSpeedSeparation -= 0.025f;
+            if (octah1.vertex[1] > octah1.height)
+                octah1.deleteSeparation();
             break;
         case GLUT_KEY_F10:
             std::cout << "F10 is pressed (exit)\n";

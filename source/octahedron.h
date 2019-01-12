@@ -36,7 +36,7 @@ namespace GL_WR {
 		static const size_t qual_side = 8;
 		GLfloat *vertex;
 		GLfloat3 *color;
-	    GLubyte **trigons;
+	    GLubyte *trigons;
 
 		//Separation
 		static const size_t Three_V = 3; //Потому что у нас треугольники (3 стороны)
@@ -52,13 +52,12 @@ namespace GL_WR {
 		void changeRot(GLfloat& axis, const GLfloat& direction);
 		void autoRotate();
 		void paint();
-		void printTrigons(size_t ind, 	const GLfloat3& color);
-		void printTrigons(	size_t ind,
-							const GLfloat3& color1,
+		void printTrigons(const GLfloat3& color);
+		void printTrigons(	const GLfloat3& color1,
 							const GLfloat3& color2,
 							const GLfloat3& color3);
-		void addSeparation(size_t ind);
-		void deleteSeparation(size_t ind);
+		void addSeparation();
+		void deleteSeparation();
 		void drawSphere();
 
 	public:
