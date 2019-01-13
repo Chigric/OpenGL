@@ -71,12 +71,12 @@ void Scene::initGlut(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING); // глобальное
     glEnable(GL_LIGHT0);
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // двухстороннее освещение
+    glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // двухстороннее освещение
 
     GLfloat light_col[] = {1.f, 1.f, 1.f, 1.f};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_col);
-    // glEnable(GL_NORMALIZE); //???
-    // glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE); //???
+    glEnable(GL_COLOR_MATERIAL);
 }
 
 void Scene::printRule()

@@ -35,6 +35,7 @@ namespace GL_WR {
 		static const size_t qual_V = 6;
 		static const size_t qual_side = 8;
 		GLfloat *vertex;
+		GLfloat *normal;
 		GLfloat3 *color;
 	    GLubyte *trigons;
 
@@ -59,6 +60,7 @@ namespace GL_WR {
 		void addSeparation();
 		void deleteSeparation();
 		void drawSphere();
+		void getNormal();
 
 	public:
 		Octahedron(GLfloat parametres);

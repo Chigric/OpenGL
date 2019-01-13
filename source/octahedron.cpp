@@ -27,8 +27,8 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     lastAutoRot->init({0, 0, 0});
 
     //Default speed of Agels
-    this->stdAutoSpeedRot = 0.8f;
-    this->stdSpeedRot = 2.f;
+    this->stdAutoSpeedRot = 2.5f;
+    this->stdSpeedRot = 2.5f;
 
     //Speed of Agels
     this->speedRot = new GLfloat3;
@@ -78,6 +78,7 @@ Octahedron::~Octahedron()
     delete[] color;
     delete[] vertex;
     delete[] trigons;
+    delete[] normal;
 
     delete[] separation;
 }
@@ -105,7 +106,12 @@ void Octahedron::initVertex()
 
     //Indexes
     trigons = new GLubyte[Three_V];
-    setArray(trigons, {0, 2, 1});
+    setArray(trigons, {0, 1, 2});
+
+    //Normal
+    normal = new GLfloat[Three_V*dimension];
+    for (size_t i = 0; i < Three_V*dimension; i+=Three_V)
+        setArray(&normal[i],	{0.0, 0.0, 0.0});
 }
 
 void Octahedron::addSeparation()
@@ -157,28 +163,31 @@ void Octahedron::printTrigons(  const GLfloat3& color1,
     glEnd();
 }
 
-void getNormal(float p1[3], float p2[3], float p3[3], float vNormal[3])
+void Octahedron::getNormal()
 {
     float v1[3], v2[3]; // для промежуточных вычислений
     float l; // норма
 
-    v1[0] = p2[0]- p1[0];
-    v1[1] = p2[1]- p1[1];
-    v1[2] = p2[2]- p1[2];
+    v1[0] = vertex[3]- vertex[0];
+    v1[1] = vertex[4]- vertex[1];
+    v1[2] = vertex[5]- vertex[2];
 
-    v2[0] = p3[0]- p1[0];
-    v2[1] = p3[1]- p1[1];
-    v2[2] = p3[2]- p1[2];
+    v2[0] = vertex[6]- vertex[0];
+    v2[1] = vertex[7]- vertex[1];
+    v2[2] = vertex[8]- vertex[2];
 
-    vNormal[0] = v1[1] * v2[2] - v1[2] * v2[1];
-    vNormal[1] = v1[2] * v2[0] - v1[0] * v2[2];
-    vNormal[2] = v1[0] * v2[1] - v1[1] * v2[0];
+    normal[0] = v1[1] * v2[2] - v1[2] * v2[1];
+    normal[1] = v1[2] * v2[0] - v1[0] * v2[2];
+    normal[2] = v1[0] * v2[1] - v1[1] * v2[0];
 
-    l = sqrt(vNormal[0]*vNormal[0] + vNormal[1]*vNormal[1] + vNormal[2]*vNormal[2]);
+    l = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
     // нормирование
-    vNormal[0] /= l;
-    vNormal[1] /= l;
-    vNormal[2] /= l;
+    normal[0] /= l;
+    normal[1] /= l;
+    normal[2] /= l;
+
+    for (size_t i = 0; i < Three_V; i++)
+        normal[i+6] = normal[i+3] = normal[i];
 }
 
 void Octahedron::paint()
@@ -187,26 +196,17 @@ void Octahedron::paint()
     glRotatef(rotate->y, 0, 1, 0);// Вращение треугольников по оси Y
     glRotatef(rotate->z, 0, 0, 1);// Вращение треугольников по оси Z
 
-    // glTranslatef(0.0, 0, 0.5f);
-    GLfloat arr[] = {0, height/2, base_width/4, 1};
-    float norm[3] = {0.0f , 0.0f , 0.0f};
-    getNormal(&vertex[0], &vertex[3], &vertex[6], norm);
-    for (int i = 0; i < 3; i++)
-        norm[i] *= -1;
-    cout << norm[0] << ' ' << norm[1] << ' ' << norm[2] << '\n';
+    getNormal();
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(dimension, GL_FLOAT, 0, vertex);
-    glNormalPointer(GL_FLOAT, 0, norm);
+    glNormalPointer(GL_FLOAT, 0, normal);
 
     GLfloat angel = 0.0f;
     for(size_t i = 0; i < qual_side; i++) {
         glPushMatrix();
             glRotatef(angel, 0.0, 1.0, 0.0);
-            //
-            // // // glNormal3f(0.0f, height, base_width/2);
-            //
             if (i == qual_side-1)
                 printTrigons(color[qual_side-1],
                             color[qual_side+0], color[qual_side+1]);
@@ -275,8 +275,8 @@ void Octahedron::autoRotate()
 void Octahedron::drawSphere()
 {
     color3f(white);
-    glTranslatef(0.0f, 0.f, 0.5);
-    glutSolidSphere(0.025, 25, 25);
+    glTranslatef(0.0f, 0.f, -1);
+    glutSolidSphere(0.05, 25, 25);
 }
 
 void GL_WR::octahTimer(int iUnused)
@@ -291,26 +291,34 @@ void GL_WR::octahRender(void) {
     // Очистка экрана и буфера глубины
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // свойства материала
+    GLfloat material_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material_diffuse);
+
+    // float lightpos[] = {0, 0, 1, 0};
+    glEnable(GL_LIGHT0);
+    // glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+    glPushMatrix();
+    //Light
+        octah1.drawSphere();
+    glPopMatrix();
+
     // glPushAttrib(GL_LINE_BIT);
 
-    glEnable(GL_LIGHT0);
     // glDepthFunc(GL_EQUAL);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_BACK);
     // glFrontFace(GL_CCW); //Она стоит по умолчанию, так что нет смысла её юзать
 
-    glLoadIdentity();   // Сброс просмотра
-
+    glPushMatrix();
     //Paint
-    octah1.paint();
+        octah1.paint();
+    glPopMatrix();
 
-    //Light
-    octah1.drawSphere();
-    float lightpos[] = {0., 0, 0.5, 1};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     glDisable(GL_LIGHT0);
-    glEnable(GL_LIGHTING);
+    // glEnable(GL_LIGHTING);
     glutSwapBuffers();
 
     // glPopAttrib();
@@ -322,6 +330,8 @@ void GL_WR::octahReshape(int Width, int Height)
     // glViewport(0, 0, 1000, 750);
     // gluOrtho2D(0, 1000, 0, 750);
     // gluOrtho2D(0, 1, 0, 0.75);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     octahRender();
 }
