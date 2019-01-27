@@ -45,6 +45,11 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     setArray(separation, {0, 0, 0});
 
     addSeparation();
+
+    //Light
+    this->lightRot = 0;
+    autoLightRot = 0;
+    this->stdAutoLightRot = 4;
 }
 
 Octahedron::Octahedron(GLfloat base_parametres, GLfloat height)
@@ -270,13 +275,30 @@ void Octahedron::autoRotate()
     rotate->x += speedRot->x;
     rotate->y += speedRot->y;
     rotate->z += speedRot->z;
+
+    //Light
+    lightRot += (autoLightRot*stdAutoLightRot);
 }
 
 void Octahedron::drawSphere()
 {
     color3f(white);
-    glTranslatef(0.0f, 0.f, -1);
+    glRotatef(lightRot, 0, 1, 0);
+    glTranslatef(0.0f, 0.f, -0.75);
     glutSolidSphere(0.05, 25, 25);
+
+    float lightpos[] = {0, 0, 0.75, 0};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+}
+
+void Octahedron::lightLeft()
+{
+    changeRot(autoLightRot, 1);
+}
+
+void Octahedron::lightRight()
+{
+    changeRot(autoLightRot, -1);
 }
 
 void GL_WR::octahTimer(int iUnused)
@@ -295,9 +317,8 @@ void GL_WR::octahRender(void) {
     GLfloat material_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material_diffuse);
 
-    // float lightpos[] = {0, 0, 1, 0};
+
     glEnable(GL_LIGHT0);
-    // glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     glPushMatrix();
     //Light
@@ -354,14 +375,20 @@ void GL_WR::octahSpecKeyboard(int key, int x, int y)
             if (octah1.vertex[1] > octah1.height)
                 octah1.deleteSeparation();
             break;
+        case GLUT_KEY_F4:
+            octah1.lightLeft();
+            break;
+        case GLUT_KEY_F5:
+            octah1.lightRight();
+            break;
         case GLUT_KEY_F10:
             std::cout << "F10 is pressed (exit)\n";
             exit(0x0);
             break;
-        case GLUT_KEY_LEFT:
+        case GLUT_KEY_RIGHT:
             octah1.rotate->y -= octah1.stdSpeedRot;
             break;
-        case GLUT_KEY_RIGHT:
+        case GLUT_KEY_LEFT:
             octah1.rotate->y += octah1.stdSpeedRot;
             break;
         case GLUT_KEY_UP:
@@ -396,12 +423,12 @@ void GL_WR::octahKeyboard(unsigned char key, int x, int y)
             // std::cout << "'S' is pressed: ";
             octah1.changeRot(octah1.autoRot->x, 1);
             break;
-        case Keys::A:
-            // std::cout << "'W' is pressed (pause): ";
-            octah1.changeRot(octah1.autoRot->y, -1);
-            break;
         case Keys::D:
             // std::cout << "'D' is pressed (pause): ";
+            octah1.changeRot(octah1.autoRot->y, -1);
+            break;
+        case Keys::A:
+            // std::cout << "'W' is pressed (pause): ";
             octah1.changeRot(octah1.autoRot->y, 1);
             break;
         case Keys::Z:

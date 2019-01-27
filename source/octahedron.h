@@ -47,6 +47,11 @@ namespace GL_WR {
 		//World
 		const size_t dimension = 3;
 
+		//Light
+		GLfloat lightRot;
+		GLfloat autoLightRot;
+		GLfloat stdAutoLightRot;
+
 	private:
 		void initVertex();
 		void pause();
@@ -76,6 +81,10 @@ namespace GL_WR {
 		friend void octahReshape(int, int);
 		friend void octahSpecKeyboard (int, int, int);
 		friend void octahKeyboard(unsigned char, int, int);
+
+		//Light
+		void lightLeft();
+		void lightRight();
 	};
 }
 
