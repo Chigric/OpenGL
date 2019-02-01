@@ -1,11 +1,14 @@
 # the compiler: gcc for C program, define as g++ for C++
 CC = g++
 
+# SOIL - for Textures
+SOIL_FLAGS = -lSOIL
+
 # Open GL flags:
 # 	-lglut
 #	-lGL
 #	-lGLU
-GLFLAGS	= -lglut -lGL -lGLU
+GLFLAGS	= $(SOIL_FLAGS) -lglut -lGL -lGLU
 
 # compiler flags:
 #	-g    adds debugging information to the executable file

@@ -20,6 +20,7 @@ namespace GL_WR {
 		void setGlutStaticFuncs();
 		void initGlutStaticFuncs();
 		void initGlut(int, char**);
+		void lightInit();
 
 		//WINDOW
 		GLfloat WINDOW_X;

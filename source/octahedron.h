@@ -52,6 +52,11 @@ namespace GL_WR {
 		GLfloat autoLightRot;
 		GLfloat stdAutoLightRot;
 
+		//Textures
+		GLuint texture[qual_side];
+		size_t viewTextures;
+		GLfloat *texturePos;
+
 	private:
 		void initVertex();
 		void pause();
@@ -66,6 +71,9 @@ namespace GL_WR {
 		void deleteSeparation();
 		void drawSphere();
 		void getNormal();
+
+		//Textures
+		void loadTexture();
 
 	public:
 		Octahedron(GLfloat parametres);

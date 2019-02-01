@@ -63,20 +63,24 @@ void Scene::initGlut(int argc, char **argv)
 {
     //Glut funcs
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 	glutInitWindowSize(WIDTH_WINDOW, HEIGHT_WINDOW);
 	glutCreateWindow("Lab_OGL");
 
     glEnable(GL_DEPTH_TEST);
+
+    lightInit();
+
+    glEnable(GL_NORMALIZE); //???
+    glEnable(GL_COLOR_MATERIAL);
+}
+
+void Scene::lightInit()
+{
     glEnable(GL_LIGHTING); // глобальное
     glEnable(GL_LIGHT0);
     glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // двухстороннее освещение
-
-    GLfloat light_col[] = {1.f, 1.f, 1.f, 1.f};
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_col);
-    glEnable(GL_NORMALIZE); //???
-    glEnable(GL_COLOR_MATERIAL);
 }
 
 void Scene::printRule()
@@ -93,6 +97,6 @@ void Scene::printRule()
         '\t' << "Brack Left/Right ([]): движение в полоскости Oz" << endl <<
         '\t' << "F4: автоматическое вращение источника света налево" << endl <<
         '\t' << "F5: автоматическое вращение источника света направо" << endl <<
-        '\t' << "Space: остановка вращение октаедра" << endl <<
+        '\t' << "Space: замораживание/размораживание вращение октаедра" << endl <<
         '\t' << "F10/Esc: закрыть программу" << endl;
 }

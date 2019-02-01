@@ -1,5 +1,7 @@
 #include <GL/freeglut.h>
 
+#include "SOIL.h"
+
 #include "global.h"
 #include "scene.h"
 #include "octahedron.h"
@@ -50,6 +52,10 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->lightRot = 0;
     autoLightRot = 0;
     this->stdAutoLightRot = 4;
+
+    //Texture
+    viewTextures = 1;
+    this->loadTexture();
 }
 
 Octahedron::Octahedron(GLfloat base_parametres, GLfloat height)
@@ -159,10 +165,13 @@ void Octahedron::printTrigons(  const GLfloat3& color1,
                                 const GLfloat3& color3)
 {
     glBegin(GL_TRIANGLES);
+        if (viewTextures==1) glTexCoord2f(0.0, 0.0);
         color3f(color1);
         glArrayElement(trigons[0]);
+        if (viewTextures==1) glTexCoord2f(1.0, 0.0);
         color3f(color2);
         glArrayElement(trigons[1]);
+        if (viewTextures==1) glTexCoord2f(0.0, 1.0);
         color3f(color3);
         glArrayElement(trigons[2]);
     glEnd();
@@ -205,6 +214,13 @@ void Octahedron::paint()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
+
+    //Textures
+    // if (viewTextures == 1) {
+    //     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    //     glTexCoordPointer(dimension, GL_FLOAT, 0, texturePos);
+    // }
+
     glVertexPointer(dimension, GL_FLOAT, 0, vertex);
     glNormalPointer(GL_FLOAT, 0, normal);
 
@@ -212,9 +228,14 @@ void Octahedron::paint()
     for(size_t i = 0; i < qual_side; i++) {
         glPushMatrix();
             glRotatef(angel, 0.0, 1.0, 0.0);
-            if (i == qual_side-1)
+            if (i == qual_side-1) {
+                //Texture
+                if (viewTextures == 1)
+                    glBindTexture(GL_TEXTURE_2D, texture[0]);
+
                 printTrigons(color[qual_side-1],
                             color[qual_side+0], color[qual_side+1]);
+            }
             else
                 printTrigons(color[i]);
         glPopMatrix();
@@ -325,18 +346,34 @@ void GL_WR::octahRender(void) {
         octah1.drawSphere();
     glPopMatrix();
 
+    if (octah1.viewTextures == 1) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, octah1.texture[0]);
+
+        glBegin(GL_TRIANGLES);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(-0.5, -1.0, 0.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(-0.5, 1.0, 0.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(0.5, -1.0, 0.0);
+        glEnd();
+    }
+
+    glPushMatrix();
+    //Paint
+        //octah1.paint();
+    glPopMatrix();
+
+    if (octah1.viewTextures == 1)
+        glDisable(GL_TEXTURE_2D);
+
     // glPushAttrib(GL_LINE_BIT);
 
     // glDepthFunc(GL_EQUAL);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_BACK);
     // glFrontFace(GL_CCW); //Она стоит по умолчанию, так что нет смысла её юзать
-
-    glPushMatrix();
-    //Paint
-        octah1.paint();
-    glPopMatrix();
-
 
     glDisable(GL_LIGHT0);
     // glEnable(GL_LIGHTING);
@@ -380,6 +417,9 @@ void GL_WR::octahSpecKeyboard(int key, int x, int y)
             break;
         case GLUT_KEY_F5:
             octah1.lightRight();
+            break;
+        case GLUT_KEY_F6:
+            octah1.viewTextures = (octah1.viewTextures) ? 0 : 1;
             break;
         case GLUT_KEY_F10:
             std::cout << "F10 is pressed (exit)\n";
@@ -450,4 +490,31 @@ void GL_WR::octahKeyboard(unsigned char key, int x, int y)
             break;
     }
     glutPostRedisplay();
+}
+
+void Octahedron::loadTexture()
+{
+    unsigned char* image[qual_side];
+    int width[qual_side], height[qual_side];
+    image[0] = SOIL_load_image("002.jpg", &width[0], &height[0], 0, SOIL_LOAD_RGB);
+
+    for (size_t i = 0; i < 1/*qual_side*/; ++i) {
+        glGenTextures(1, &texture[i]);
+        glBindTexture(GL_TEXTURE_2D, texture[i]);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[i], height[i], 0, GL_RGB, GL_UNSIGNED_BYTE, image[i]);
+
+        //Setup filtres
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        if( 0 == image[0] )
+        {
+        	printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+        }
+
+        //FREE!!!
+        SOIL_free_image_data(image[i]);
+        // glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
