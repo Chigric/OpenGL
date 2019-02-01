@@ -52,6 +52,9 @@ namespace GL_WR {
 		GLfloat autoLightRot;
 		GLfloat stdAutoLightRot;
 
+		//Blend
+		bool isBlend;
+
 	private:
 		void initVertex();
 		void pause();
@@ -66,6 +69,9 @@ namespace GL_WR {
 		void deleteSeparation();
 		void drawSphere();
 		void getNormal();
+
+		//Blend
+		void setBlend();
 
 	public:
 		Octahedron(GLfloat parametres);

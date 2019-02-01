@@ -50,6 +50,9 @@ Octahedron::Octahedron(GLfloat base_width, GLfloat base_length, GLfloat height)
     this->lightRot = 0;
     autoLightRot = 0;
     this->stdAutoLightRot = 4;
+
+    //Blend
+    this->isBlend = false;
 }
 
 Octahedron::Octahedron(GLfloat base_parametres, GLfloat height)
@@ -301,6 +304,21 @@ void Octahedron::lightRight()
     changeRot(autoLightRot, -1);
 }
 
+void Octahedron::setBlend()
+{
+    if (isBlend)
+    {
+        glEnable(GL_BLEND);
+        glDepthMask(GL_FALSE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    }
+    else
+    {
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+}
+
 void GL_WR::octahTimer(int iUnused)
 {
     octah1.autoRotate();
@@ -317,6 +335,7 @@ void GL_WR::octahRender(void) {
     GLfloat material_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material_diffuse);
 
+    octah1.setBlend();
 
     glEnable(GL_LIGHT0);
 
@@ -380,6 +399,9 @@ void GL_WR::octahSpecKeyboard(int key, int x, int y)
             break;
         case GLUT_KEY_F5:
             octah1.lightRight();
+            break;
+        case GLUT_KEY_F8:
+            octah1.isBlend = (octah1.isBlend) ? false : true;
             break;
         case GLUT_KEY_F10:
             std::cout << "F10 is pressed (exit)\n";
