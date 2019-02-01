@@ -21,6 +21,9 @@ namespace GL_WR {
 		void initGlutStaticFuncs();
 		void initGlut(int, char**);
 
+		//Lighting
+		void lightInit();
+
 		//WINDOW
 		GLfloat WINDOW_X;
 		GLfloat WINDOW_Y;
